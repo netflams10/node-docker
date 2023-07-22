@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - ./:/app
+    user: node
+    networks:
+      - node_docker
+
+  web:
+    image: nginx:alpine
+    container_name: web
+    volumes:
+      - ./configuration/nginx/local_template.conf:/etc/nginx/conf.d/default.conf
+    command: [nginx-debug, '-g', 'daemon off;']
+    ports:
+      - "3050:80"
+    depends_on:
+      - api
+    networks:
+      - node_docker
+
+networks:
+  node_docker:
+    driver: bridge
